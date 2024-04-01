@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="{% static 'user_side/css/user_signup.css' %}">
+  <style>
+    /* Your existing CSS styles */
+    .center-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; /* Adjust as needed */
+    }
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 350px;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 20px;
+      position: relative;
+    }
+    .title {
+      font-size: 28px;
+      color: #a23f25;
+      font-weight: 600;
+      letter-spacing: -1px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding-left: 30px;
+    }
+    .title::before, .title::after {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      border-radius: 50%;
+      left: 0px;
+      background-color: #a23f25;
+    }
+    .title::before {
+      width: 18px;
+      height: 18px;
+      background-color: #a23f25;
+    }
+    .title::after {
+      width: 18px;
+      height: 18px;
+      animation: pulse 1s linear infinite;
+    }
+    .message, .signin {
+      color: rgba(88, 87, 87, 0.822);
+      font-size: 14px;
+    }
+    .signin {
+      text-align: center;
+    }
+    .signin a {
+      color: royalblue;
+    }
+    .signin a:hover {
+      text-decoration: underline royalblue;
+    }
+    .form label {
+      position: relative;
+    }
+    .form label .input {
+      width: 100%;
+      padding: 10px 10px 20px 10px;
+      outline: 0;
+      border: 1px solid rgba(105, 105, 105, 0.397);
+      border-radius: 10px;
+    }
+    .form label .input + span {
+      position: absolute;
+      left: 10px;
+      top: 15px;
+      color: grey;
+      font-size: 0.9em;
+      cursor: text;
+      transition: 0.3s ease;
+    }
+    .form label .input:placeholder-shown + span {
+      top: 15px;
+      font-size: 0.9em;
+    }
+    .form label .input:focus + span, .form label .input:valid + span {
+      top: 30px;
+      font-size: 0.7em;
+      font-weight: 600;
+    }
+    .form label .input:valid + span {
+      color: green;
+    }
+    .submit {
+      border: none;
+      outline: none;
+      background-color: #a23f25;
+      padding: 10px;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 16px;
+      transform: .3s ease;
+    }
+    .submit:hover {
+      background-color: rgb(145, 60, 38);
+    }
+    @keyframes pulse {
+      from {
+        transform: scale(0.9);
+        opacity: 1;
+      }
+      to {
+        transform: scale(1.8);
+        opacity: 0;
+      }
+    }    
+
+    .form {
+      /* Other styles */
+      position: relative;
+    }
+    .forgot-password {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 10px;
+      font-size: 14px;
+      color: royalblue;
+      text-decoration: none;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      padding: 5px 10px;
+      border-radius: 5px;
+    }
+    .login-google {
+      width: 100%;
+      background-color: #db4437;
+      color: #fff;
+      border: none;
+      outline: none;
+      padding: 10px;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .login-google img {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+    .button-separator {
+      height: 2px;
+      background-color: rgba(0, 0, 0, 0.1); /* Light gray color */
+      margin: 20px 0; /* Adjusted margin */
+    }
+    .error-message {
+      color: red; /* Adjust color as needed */
+      font-size: 14px; /* Adjust font size as needed */
+      margin-top: 5px; /* Adjust margin as needed */
+    }
+  </style>
+</head>
+<body>
+  <div class="center-container">
+    <form class="form" method="post" action="{% url 'accounts:login' %}">
+      {% csrf_token %}
+      <p class="title">Login</p>
+      <p class="message">Hello there!</p>
+      
+      <!-- Display error messages here -->
+      {% if messages %}
+        {% for message in messages %}
+          <p class="error-message">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+      
+      <label>
+        <input required="" placeholder="" type="email" class="input" name="email">
+        <span>Email</span>
+      </label> 
+      <label>
+        <input required="" placeholder="" type="password" class="input" name="password">
+        <span>Password</span>
+      </label>
+      <button class="submit">LogIn</button>
+      <div class="button-separator"></div>
+      <a href="{% url 'accounts:forgot_password' %}" class="forgot-password">Forgot Password?</a>
+      <button class="login-google">
+        <img src="{% static 'user_side/images/web_light_rd_na@1x.png' %}" alt="Google Icon">
+        Login with Google
+      </button>
+      <p class="signin">Don't have an account? <a href="{% url 'accounts:register' %}">Sign up</a></p>
+    </form>
+  </div>
+</body>
+</html>

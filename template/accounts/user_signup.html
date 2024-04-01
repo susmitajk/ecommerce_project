@@ -1,0 +1,239 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register</title>
+  
+  <link rel="stylesheet" href="{% static 'user_side/css/styles.css' %}">
+  <style>
+    /* Back to home link */
+    .back-to-home {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        text-decoration: none;
+        color: #808080; /* Light gray color */
+        font-size: 18px; /* Increased font size */
+    }
+    
+    .back-to-home:hover {
+        text-decoration: underline;
+    }
+    
+    .back-to-home::before {
+        content: '\2190'; /* Unicode for left arrow */
+        margin-right: 5px; /* Add spacing between arrow and text */
+    }
+    
+    /* Center container */
+    .center-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Adjust as needed */
+    }
+    
+    /* Form container */
+    .form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-width: 350px;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 20px;
+        position: relative;
+    }
+    
+    /* Title styling */
+    .title {
+        font-size: 28px;
+        color: #a23f25;
+        font-weight: 600;
+        letter-spacing: -1px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        padding-left: 30px;
+    }
+    
+    .title::before, .title::after {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        border-radius: 50%;
+        left: 0px;
+        background-color: #a23f25;
+    }
+    
+    .title::before {
+        width: 18px;
+        height: 18px;
+        background-color: #a23f25;
+    }
+    
+    .title::after {
+        width: 18px;
+        height: 18px;
+        animation: pulse 1s linear infinite;
+    }
+    
+    /* Message and Sign-in link styling */
+    .message, .signin {
+        color: rgba(88, 87, 87, 0.822);
+        font-size: 14px;
+    }
+    
+    .signin {
+        text-align: center;
+    }
+    
+    .signin a {
+        color: royalblue;
+    }
+    
+    .signin a:hover {
+        text-decoration: underline royalblue;
+    }
+    
+    /* Label and input styling */
+    .form label {
+        position: relative;
+    }
+    
+    .form label .input {
+        width: 100%;
+        padding: 10px 10px 20px 10px;
+        outline: 0;
+        border: 1px solid rgba(105, 105, 105, 0.397);
+        border-radius: 10px;
+    }
+    
+    .form label .input + span {
+        position: absolute;
+        left: 10px;
+        top: 15px;
+        color: grey;
+        font-size: 0.9em;
+        cursor: text;
+        transition: 0.3s ease;
+    }
+    
+    .form label .input:placeholder-shown + span {
+        top: 15px;
+        font-size: 0.9em;
+    }
+    
+    .form label .input:focus + span,
+    .form label .input:valid + span {
+        top: 30px;
+        font-size: 0.7em;
+        font-weight: 600;
+    }
+    
+    .form label .input:valid + span {
+        color: green;
+    }
+    
+    /* Submit button styling */
+    .submit {
+        border: none;
+        outline: none;
+        background-color: #a23f25;
+        padding: 10px;
+        border-radius: 10px;
+        color: #fff;
+        font-size: 16px;
+        transform: .3s ease;
+    }
+    
+    .submit:hover {
+        background-color: rgb(145, 60, 38);
+    }
+    
+    /* Error message styling */
+    .error-message {
+        color: #ff0000; /* Red color */
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    
+    .error-list {
+        list-style-type: none; /* Remove bullet points */
+        padding: 0; /* Remove default padding */
+        margin: 0; /* Remove default margin */
+    }
+    
+    @keyframes pulse {
+        from {
+            transform: scale(0.9);
+            opacity: 1;
+        }
+    
+        to {
+            transform: scale(1.8);
+            opacity: 0;
+        }
+    }
+  </style>
+</head>
+<body>
+    <a href="{% url 'home' %}" class="back-to-home">Back to Home</a>
+    <div class="center-container">
+    <form class="form" method="post" action="{% url 'accounts:register' %}">
+        {% csrf_token %}
+        <p class="title">Register</p>
+        <p class="message">Signup now and get full access to our app.</p>
+        
+        {% if form.errors %}
+          <ul class="error-list">
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+              <li class="error-message">{{ error }}</li>
+            {% endfor %}
+          {% endfor %}
+          </ul>
+        {% endif %}
+    
+        <label>
+            <input required="" placeholder="" type="text" class="input" name="first_name">
+            <span>Firstname</span>
+        </label>
+    
+        <label>
+            <input required="" placeholder="" type="text" class="input" name="last_name">
+            <span>Lastname</span>
+        </label>
+     
+        <label>
+            <input required="" placeholder="" type="text" class="input" name="username">
+            <span>Username</span>
+        </label>
+    
+        <label>
+            <input required="" placeholder="" type="email" class="input" name="email">
+            <span>Email</span>
+        </label> 
+        
+        <label>
+            <input required="" placeholder="" type="tel" class="input" name="phone_number">
+            <span>Phone</span>
+        </label> 
+
+        <label>
+            <input required="" placeholder="" type="password" class="input" name="password1">
+            <span>Password</span>
+        </label>
+        <label>
+            <input required="" placeholder="" type="password" class="input" name="password2">
+            <span>Confirm password</span>
+        </label>
+        <button class="submit" type="submit">Register</button>
+        <p class="signin">Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a></p>
+    </form>
+    </div>
+</body>
+</html>

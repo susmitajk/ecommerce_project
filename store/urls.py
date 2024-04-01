@@ -5,4 +5,5 @@ from store import views
 urlpatterns = [
     path('', views.homepage, name='home'),
     
+    
 ]

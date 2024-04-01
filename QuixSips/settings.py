@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'category',
     'store',
     
 ]
@@ -73,6 +74,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'QuixSips.wsgi.application'
 
+AUTH_USER_MODEL = 'accounts.Account'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default authentication backend
+    'accounts.backends.EmailVerificationBackend',  # Custom authentication backend
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
@@ -140,6 +147,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+# Email Settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = 'b6c1bc442e6a81'
+EMAIL_HOST_PASSWORD = 'd5efe83857afa8'
+EMAIL_PORT = '2525'
 
 
