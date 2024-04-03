@@ -88,8 +88,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'ecomdb',      # Name of your PostgreSQL database
-        'USER': 'susy',        # Your PostgreSQL username
-        'PASSWORD': 'password',# Your PostgreSQL password
+        'USER': 'postgres',        # Your PostgreSQL username
+        'PASSWORD': 'susmita123',# Your PostgreSQL password
         'HOST': 'localhost',   # Host where PostgreSQL server is running
         'PORT': '5432',        # Port where PostgreSQL server is running
     }
