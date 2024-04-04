@@ -85,42 +85,16 @@
 		<section class="ftco-section ftco-no-pb">
 			<div class="container">
 				<div class="row">
+					{% for cat in category%}
 					<div class="col-lg-2 col-md-4 ">
 						<div class="sort w-100 text-center ftco-animate">
-							<div class="img" style="background-image: url('{% static 'user_side/images/kind-1.jpg' %}');"></div>
-							<h3>Brandy</h3>
+							{% if cat.cat_image %}
+							<div class="img" style="background-image: url('{{ cat.cat_image.url }}');"></div>
+							{% endif %}
+							<h3>{{ cat.category_name }}</h3>
 						</div>
 					</div>
-					<div class="col-lg-2 col-md-4 ">
-						<div class="sort w-100 text-center ftco-animate">
-							<div class="img" style="background-image: url('{% static 'user_side/images/kind-2.jpg' %}');"></div>
-							<h3>Gin</h3>
-						</div>
-					</div>
-					<div class="col-lg-2 col-md-4 ">
-						<div class="sort w-100 text-center ftco-animate">
-							<div class="img" style="background-image: url('{% static 'user_side/images/kind-3.jpg' %}');"></div>
-							<h3>Rum</h3>
-						</div>
-					</div>
-					<div class="col-lg-2 col-md-4 ">
-						<div class="sort w-100 text-center ftco-animate">
-							<div class="img" style="background-image: url('{% static 'user_side/images/kind-4.jpg' %}');"></div>
-							<h3>Tequila</h3>
-						</div>
-					</div>
-					<div class="col-lg-2 col-md-4 ">
-						<div class="sort w-100 text-center ftco-animate">
-							<div class="img" style="background-image: url('{% static 'user_side/images/kind-5.jpg' %}');"></div>
-							<h3>Vodka</h3>
-						</div>
-					</div>
-					<div class="col-lg-2 col-md-4 ">
-						<div class="sort w-100 text-center ftco-animate">
-							<div class="img" style="background-image: url('{% static 'user_side/images/kind-6.jpg' %}');"></div>
-							<h3>Whiskey</h3>
-						</div>
-					</div>
+					{% endfor %}
 
 				</div>
 			</div>
@@ -135,15 +109,13 @@
           </div>
         </div>
 				<div class="row">
+					<!-- Loop through product  -->
 					{% for product in products %}
-  						<!-- Loop through product variants -->
-  						{% for variant in product.variants.all %}
 					     <!-- product list -->
 							<div class="col-md-3 d-flex">
-								
 								<div class="product ftco-animate">
-									{% if product.images.all %}
-									<div class="img d-flex align-items-center justify-content-center" style="background-image: url('{{ product.images.first.image.url }}');">
+									{% if product.image %}
+									<div class="img d-flex align-items-center justify-content-center" style="background-image: url('{{ product.image.url }}');">
 										<div class="desc">
 											<p class="meta-prod d-flex">
 												<a href="#" class="d-flex align-items-center justify-content-center"><span class="flaticon-shopping-bag"></span></a>
@@ -156,23 +128,26 @@
 									<div class="text text-center">
 										<span class="sale">Sale</span>
 										<span class="category">{{ product.category.category_name }}</span>
-										<h2>{{ variant.name }}</h2>
-										<p class="mb-0"><span class="price">${{ variant.price }}</span></p>
+										<h2>{{ product.product_name }}</h2>
+										{% if product.variants.all %}
+										<p class="mb-0"><span class="price">${{ product.variants.first.price }}</span></p>
+										{% endif %}
 									</div>
 								</div>
 							</div>
-						{% endfor %}
+						
 					{% endfor %}
 				</div>
 				<!-- View All Products button -->
 				<div class="row justify-content-center">
 					<div class="col-md-4">
-						<a href="product.html" class="btn btn-primary d-block">View All Products <span class="fa fa-long-arrow-right"></span></a>
+						<a href="{% url 'product_list' %}" class="btn btn-primary d-block">View All Products <span class="fa fa-long-arrow-right"></span></a>
 					</div>
 				</div>
 			</div>
 		</section>
-  
+		
+	<!--Testimonials-->
     <section class="ftco-section testimony-section img" style="background-image: url('{% static 'user_side/images/bg_4.jpg' %}');">
     	<div class="overlay"></div>
       <div class="container">

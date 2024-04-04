@@ -35,6 +35,7 @@ class Product(models.Model):
     liquor_type = models.ForeignKey(Type, on_delete=models.CASCADE)
     is_deleted = models.BooleanField(default=False)
     image = models.ImageField(upload_to='photos/products')
+    
 
     def get_url(self):
         return reverse('product_detail', args=[self.category.slug, self.slug])

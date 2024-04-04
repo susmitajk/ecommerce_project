@@ -1,0 +1,110 @@
+{% extends "store/store_base.html" %}
+{% load static %}
+
+{% block content %}
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row">
+              {% for variant in variants %}
+                <div class="col-lg-6 mb-5 ftco-animate">
+                    <a href="images/prod-1.jpg" class="image-popup prod-img-bg"><img src="{{ product.image.url }}" class="img-fluid" alt="{{ product.product_name }}"></a>
+                </div>
+                <div class="col-lg-6 product-details pl-md-5 ftco-animate">
+                    <h3>{{ variant.name  }}</h3>
+                    <div class="rating d-flex">
+                        <p class="text-left mr-4">
+                            <a href="#" class="mr-2">5.0</a>
+                            <a href="#"><span class="fa fa-star"></span></a>
+                            <a href="#"><span class="fa fa-star"></span></a>
+                            <a href="#"><span class="fa fa-star"></span></a>
+                            <a href="#"><span class="fa fa-star"></span></a>
+                            <a href="#"><span class="fa fa-star"></span></a>
+                        </p>
+                        <p class="text-left mr-4">
+                            <a href="#" class="mr-2" style="color: #000;">100 <span style="color: #bbb;">Rating</span></a>
+                        </p>
+                    </div>
+                    <p class="price"><span id="product-price">${{ variant.price }}</span></p>
+                    <p>{{ product.description }}</p>
+                    <div class="row mt-4">
+                        <div class="input-group col-md-6 d-flex mb-3">
+                            <span class="input-group-btn mr-2">
+                                <button type="button" class="quantity-left-minus btn"  data-type="minus" data-field="">
+                                    <i class="fa fa-minus"></i>
+                                </button>
+                            </span>
+                            <input type="text" id="quantity" name="quantity" class="quantity form-control input-number" value="1" min="1" max="100">
+                            <span class="input-group-btn ml-2">
+                                <button type="button" class="quantity-right-plus btn" data-type="plus" data-field="">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </span>
+                        </div>
+                        <!-- Dropdown menu to select variant based on volume -->
+                        <div class="input-group col-md-6 d-flex mb-3">
+                            <select id="variant-select" class="form-control">
+                                {% for variant in variants %}
+                                    <option value="{{ variant.id }}">{{ variant.name }} - {{ variant.volume }} ml</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <p class="variant-details">Age: <span class="age">{{ variant.age }}</span>, Proof: <span class="proof">{{ variant.proof }}</span>, Volume: <span class="volume">{{ variant.volume }}</span> ml</p>
+                    <div class="w-100"></div>
+                    <div class="col-md-12">
+                        <p style="color: #000;"><span class="stock">{{ variant.stock }}</span> pieces available</p>
+                    </div>
+                    <p><a href="cart.html" class="btn btn-primary py-3 px-5 mr-2">Add to Cart</a><a href="cart.html" class="btn btn-primary py-3 px-5">Buy now</a></p>
+                </div>
+              {% endfor %}
+            </div>
+            <!-- Product tabs -->
+            <div class="row mt-5">
+                <div class="col-md-12 nav-link-wrap">
+                    <div class="nav nav-pills d-flex text-center" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <a class="nav-link ftco-animate active mr-lg-1" id="v-pills-1-tab" data-toggle="pill" href="#v-pills-1" role="tab" aria-controls="v-pills-1" aria-selected="true">Description</a>
+                    </div>
+                </div>
+                <div class="col-md-12 tab-wrap">
+                    <div class="tab-content bg-light" id="v-pills-tabContent">
+                        <div class="tab-pane fade show active" id="v-pills-1" role="tabpanel" aria-labelledby="day-1-tab">
+                            <div class="p-4">
+                                <h3 class="mb-4">{{ product.product_name }}</h3>
+                                <p>{{ product.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    console.log('Variants:', '{{ variants|safe }}');
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const variantSelect = document.getElementById('variant-select');
+        const variants = JSON.parse('{{ variants|safe }}');
+   
+        variantSelect.addEventListener('change', function() {
+            const variantId = this.value;
+            const selectedVariant = variants.find(variant => variant.id == variantId);
+            console.log(selectedVariant);
+            // Update product details based on selected variant
+            document.querySelector('.price span').textContent = '$' + selectedVariant.fields.price; // Update to access fields
+            document.querySelector('.stock').textContent = selectedVariant.fields.stock + ' pieces available'; // Update to access fields
+
+            // Update variant details like age, proof, volume, etc.
+            document.querySelector('.age').textContent = selectedVariant.fields.age; // Update to access fields
+            document.querySelector('.proof').textContent = selectedVariant.fields.proof; // Update to access fields
+            document.querySelector('.volume').textContent = selectedVariant.fields.volume; // Update to access fields
+
+            // Additional logic as needed
+        });
+    });
+</script>
+{% endblock scripts %}

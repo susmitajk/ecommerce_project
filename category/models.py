@@ -17,7 +17,7 @@ class Category(models.Model):
         verbose_name_plural = 'categories'
 
     def get_url(self):
-            return reverse('products_by_category', args=[self.slug])
+            return reverse('product_list_by_category', args=[self.slug])
     
     def soft_delete(self, *args, **kwargs):
         # Soft delete by setting is_deleted to True
