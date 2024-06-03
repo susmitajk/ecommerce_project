@@ -1,0 +1,69 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">View Order</h2>
+                    <div>
+                        <a href="{% url 'order_list' %}" class="btn btn-md rounded font-sm hover-up">Back to orders</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="order_uuid" class="form-label">Order UUID</label>
+                            <input type="text" class="form-control" id="order_uuid" value="{{ order.uuid }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label for="user_email" class="form-label">User Email</label>
+                            <input type="text" class="form-control" id="user_email" value="{{ order.user.email }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label for="address_line_1" class="form-label">Address Line 1</label>
+                            <input type="text" class="form-control" id="address_line_1" value="{{ order.address_line_1 }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label for="address_line_2" class="form-label">Address Line 2</label>
+                            <input type="text" class="form-control" id="address_line_2" value="{{ order.address_line_2 }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label for="city" class="form-label">City</label>
+                            <input type="text" class="form-control" id="city" value="{{ order.city }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label for="country" class="form-label">Country</label>
+                            <input type="text" class="form-control" id="country" value="{{ order.country }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label for="postal_code" class="form-label">Postal Code</label>
+                            <input type="text" class="form-control" id="postal_code" value="{{ order.postal_code }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label for="total_price" class="form-label">Total Price</label>
+                            <input type="text" class="form-control" id="total_price" value="{{ order.total_price }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label for="status" class="form-label">Status</label>
+                            <input type="text" class="form-control" id="status" value="{{ order.status }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <label for="status" class="form-label">Return Status</label>
+                            <input type="text" class="form-control" id="returned" value="{{ order.return_status }}" readonly>
+                        </div>
+                        <div class="mb-4">
+                            <button type="submit" name="accept" class="btn btn-success">Accept Return</button>
+                            <button type="submit" name="reject" class="btn btn-danger">Reject Return</button>
+                        </div>
+                    </div>
+                </div> <!-- card end// -->
+            </div>
+        </div>
+    </form>
+</section>
+{% endblock %}

@@ -9961,3 +9961,35 @@ textarea.form-control {
   100% {
     stroke-dasharray: 89, 200;
     stroke-dashoffset: -136px; } }
+
+
+
+
+    .address-info {
+      border: 1px solid #e0e0e0;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+  }
+  
+  .address-info h5 {
+      margin-bottom: 10px;
+  }
+  
+  .address-info a {
+      margin-top: 10px;
+      display: inline-block;
+  }
+  
+  .address-details {
+      margin-top: 20px;
+  }
+  
+  .address-details p {
+      margin-bottom: 5px;
+  }
+  
+  .address-details address {
+      font-style: normal;
+  }
+

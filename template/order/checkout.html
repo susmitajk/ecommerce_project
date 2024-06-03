@@ -1,0 +1,190 @@
+{% extends "store/store_base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="hero-wrap hero-wrap-2" style="background-image: url('{% static 'user_side/images/bg_2.jpg' %}');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-end justify-content-center">
+            <div class="col-md-9 ftco-animate mb-5 text-center">
+                <p class="breadcrumbs mb-0"><span class="mr-2"><a href="{% url 'home' %}">Home <i class="fa fa-chevron-right"></i></a></span> <span>Checkout <i class="fa fa-chevron-right"></i></span></p>
+                <h2 class="mb-0 bread">Checkout</h2>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="ftco-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 ftco-animate">
+                <h3 class="mb-4 billing-heading">Billing Details</h3>
+                {% if addresses %}
+                <form id="checkout-form" action="{% url 'place_order' %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="total_price" value="{{ total_price }}">
+                    <input type="hidden" name="payment_method" id="payment-method" value="cash_on_delivery">
+                    <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+                    <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+                    <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+                    <input type="hidden" id="payment_status" name="payment_status" value="">
+
+                    {% for address in addresses %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" id="address{{ address.id }}" name="address" class="custom-control-input" data-address-id="{{ address.id }}" value="{{ address.id }}" {% if address.is_default %}checked{% endif %}>
+                                <label class="custom-control-label" for="address{{ address.id }}">
+                                    <strong>{{ address.user.first_name }} {{ address.user.last_name }}</strong><br>
+                                    {{ address.address_line_1 }}, {{ address.address_line_2 }}<br>
+                                    {{ address.city }}, {{ address.country }}<br>
+                                    {{ address.postal_code }}<br>
+                                    Phone: {{ address.user.phone_number }}<br>
+                                    Email: {{ address.user.email }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                    <div class="row align-items-end">
+                        <div class="col-md-12">
+                            <a href="{% url 'accounts:create_address' %}?next=checkout" class="btn btn-primary">Add New Address</a>
+                            <a href="{% url 'accounts:edit_address' address_id=addresses.0.id %}?next=checkout" class="btn btn-primary" id="edit-address-btn">Edit Address</a>
+                        </div>
+                    </div>
+                    
+                
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row mt-5 pt-3 d-flex">
+            <div class="col-md-6 d-flex">
+                <div class="cart-detail cart-total p-3 p-md-4">
+                    <h3 class="billing-heading mb-4">Cart Total</h3>
+                    <p class="d-flex">
+                        <span>Subtotal</span>
+                        <span>${{ total_price }}</span>
+                    </p>
+                    <p class="d-flex">
+                        <span>Coupon Discount</span>
+                        <span>${{ coupon_discount_amount }}</span>
+                    </p>
+                    <p class="d-flex">
+                        <span>Discount</span>
+                        <span>${{ cart.get_total_discount_amount }}</span>
+                    </p>
+                    <hr>
+                    <p class="d-flex total-price">
+                        <span>Total</span>
+                        <span>${{ discounted_price }}</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="cart-detail p-3 p-md-4">
+                    <h3 class="billing-heading mb-4">Payment Method</h3>
+                    
+                    <div class="cart-detail p-3 p-md-4">
+                        {% if discounted_price <= 300 %}
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <div class="radio">
+                                    <label><input type="radio" name="payment_method" value="cash_on_delivery" class="mr-2"> Cash On Delivery</label>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <div class="radio">
+                                    <label><input type="radio" name="payment_method" value="online_payment" class="mr-2"> Online Payment</label>
+                                </div>
+                            </div>
+                        </div>
+                        <p><button type="submit" id="place-order-btn" class="btn btn-primary py-3 px-4">Place Order</button></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    </div>
+</section>
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editAddressBtn = document.getElementById('edit-address-btn');
+        const radioButtons = document.querySelectorAll('input[name="address"]');
+        const placeOrderBtn = document.getElementById('place-order-btn');
+        const checkoutForm = document.getElementById('checkout-form');
+    
+        radioButtons.forEach(radioButton => {
+            radioButton.addEventListener('change', function() {
+                if (this.checked) {
+                    const selectedAddressId = this.dataset.addressId;
+                    editAddressBtn.href = `{% url 'accounts:edit_address' address_id=0 %}`.replace('0', selectedAddressId);
+                }
+            });
+        });
+    
+        placeOrderBtn.addEventListener('click', function(event) {
+            const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            if (selectedPaymentMethod === 'online_payment') {
+                event.preventDefault();
+                document.getElementById('payment-method').value = 'online_payment';
+    
+                fetch('{% url "create_razorpay_order" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify({
+                        total_price: {{ discounted_price|floatformat:2 }},
+                        address_id: document.querySelector('input[name="address"]:checked').value
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    var options = {
+                        "key": "{{ razorpay_key }}",
+                        "amount": data.amount, 
+                        "currency": "INR",
+                        "name": "QuixSips",
+                        "description": "Order # " + data.order_id,
+                        "order_id": data.order_id,
+                        "handler": function (response){
+                            document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+                            document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                            document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                            checkoutForm.submit();
+                        },
+                        "prefill": {
+                            "name": "{{ request.user.get_full_name }}",
+                            "email": "{{ request.user.email }}",
+                            "contact": "{{ request.user.phone_number }}"
+                        },
+                        "theme": {
+                            "color": "#3399cc"
+                        }
+                    };
+                    var rzp1 = new Razorpay(options);
+                    rzp1.open();
+                })
+                .catch(error => {
+                    console.error('Error creating Razorpay order:', error);
+                    // Handle error (e.g., show an error message to the user)
+                });
+            } else {
+                // Allow default form submission for COD
+                document.getElementById('payment-method').value = 'cash_on_delivery';
+            }
+        });
+    });
+</script>
+{% endblock scripts %}

@@ -2,109 +2,287 @@
 {% load static %}
 
 {% block content %}
-    <section class="ftco-section">
-        <div class="container">
-            <div class="row">
-              {% for variant in variants %}
-                <div class="col-lg-6 mb-5 ftco-animate">
-                    <a href="images/prod-1.jpg" class="image-popup prod-img-bg"><img src="{{ product.image.url }}" class="img-fluid" alt="{{ product.product_name }}"></a>
-                </div>
-                <div class="col-lg-6 product-details pl-md-5 ftco-animate">
-                    <h3>{{ variant.name  }}</h3>
-                    <div class="rating d-flex">
-                        <p class="text-left mr-4">
-                            <a href="#" class="mr-2">5.0</a>
-                            <a href="#"><span class="fa fa-star"></span></a>
-                            <a href="#"><span class="fa fa-star"></span></a>
-                            <a href="#"><span class="fa fa-star"></span></a>
-                            <a href="#"><span class="fa fa-star"></span></a>
-                            <a href="#"><span class="fa fa-star"></span></a>
-                        </p>
-                        <p class="text-left mr-4">
-                            <a href="#" class="mr-2" style="color: #000;">100 <span style="color: #bbb;">Rating</span></a>
-                        </p>
-                    </div>
-                    <p class="price"><span id="product-price">${{ variant.price }}</span></p>
-                    <p>{{ product.description }}</p>
-                    <div class="row mt-4">
-                        <div class="input-group col-md-6 d-flex mb-3">
-                            <span class="input-group-btn mr-2">
-                                <button type="button" class="quantity-left-minus btn"  data-type="minus" data-field="">
-                                    <i class="fa fa-minus"></i>
-                                </button>
-                            </span>
-                            <input type="text" id="quantity" name="quantity" class="quantity form-control input-number" value="1" min="1" max="100">
-                            <span class="input-group-btn ml-2">
-                                <button type="button" class="quantity-right-plus btn" data-type="plus" data-field="">
-                                    <i class="fa fa-plus"></i>
-                                </button>
-                            </span>
-                        </div>
-                        <!-- Dropdown menu to select variant based on volume -->
-                        <div class="input-group col-md-6 d-flex mb-3">
-                            <select id="variant-select" class="form-control">
-                                {% for variant in variants %}
-                                    <option value="{{ variant.id }}">{{ variant.name }} - {{ variant.volume }} ml</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                    </div>
-                    <p class="variant-details">Age: <span class="age">{{ variant.age }}</span>, Proof: <span class="proof">{{ variant.proof }}</span>, Volume: <span class="volume">{{ variant.volume }}</span> ml</p>
-                    <div class="w-100"></div>
-                    <div class="col-md-12">
-                        <p style="color: #000;"><span class="stock">{{ variant.stock }}</span> pieces available</p>
-                    </div>
-                    <p><a href="cart.html" class="btn btn-primary py-3 px-5 mr-2">Add to Cart</a><a href="cart.html" class="btn btn-primary py-3 px-5">Buy now</a></p>
-                </div>
-              {% endfor %}
-            </div>
-            <!-- Product tabs -->
-            <div class="row mt-5">
-                <div class="col-md-12 nav-link-wrap">
-                    <div class="nav nav-pills d-flex text-center" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-                        <a class="nav-link ftco-animate active mr-lg-1" id="v-pills-1-tab" data-toggle="pill" href="#v-pills-1" role="tab" aria-controls="v-pills-1" aria-selected="true">Description</a>
-                    </div>
-                </div>
-                <div class="col-md-12 tab-wrap">
-                    <div class="tab-content bg-light" id="v-pills-tabContent">
-                        <div class="tab-pane fade show active" id="v-pills-1" role="tabpanel" aria-labelledby="day-1-tab">
-                            <div class="p-4">
-                                <h3 class="mb-4">{{ product.product_name }}</h3>
-                                <p>{{ product.description }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<section class="hero-wrap hero-wrap-2" style="background-image: url('{% static 'user_side/images/bg_2.jpg' %}');" data-stellar-background-ratio="0.5">
+    <div class="overlay"></div>
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-end justify-content-center">
+            <div class="col-md-9 ftco-animate mb-5 text-center">
+                <p class="breadcrumbs mb-0"><span class="mr-2"><a href="{% url 'home' %}">Home <i class="fa fa-chevron-right"></i></a></span> <span>Products <i class="fa fa-chevron-right"></i></span></p>
+                <h2 class="mb-0 bread">Products</h2>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+
+<section class="ftco-section">
+    <div class="container">
+        <div class="row">
+            {% if variant %}
+            <!-- Main product image -->
+            <div class="col-lg-6 mb-5 ftco-animate">
+                <div class="main-product-image">
+                    <a href="{{ images.0.image.url }}" class="image-popup prod-img-bg">
+                        <img src="{{ images.0.image.url }}" class="img-fluid main-image" alt="{{ variant.name }}">
+                    </a>
+                </div>
+                <!-- Thumbnail images -->
+                <div class="row mt-3">
+                    {% for image in images %}
+                    <div class="col-lg-3 col-md-4 col-6">
+                        <a href="{{ image.image.url }}" class="thumbnail">
+                            <img src="{{ image.image.url }}" class="img-fluid" alt="{{ variant.name }}">
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-lg-6 product-details pl-md-5 ftco-animate">
+                <h3>{{ variant.name }}</h3>
+                <div class="rating d-flex">
+                    <p class="text-left mr-4">
+                        <a href="#" class="mr-2">5.0</a>
+                        <a href="#"><span class="fa fa-star"></span></a>
+                        <a href="#"><span class="fa fa-star"></span></a>
+                        <a href="#"><span class="fa fa-star"></span></a>
+                        <a href="#"><span class="fa fa-star"></span></a>
+                        <a href="#"><span class="fa fa-star"></span></a>
+                    </p>
+                    <p class="text-left mr-4">
+                        <a href="#" class="mr-2" style="color: #000;">100 <span style="color: #bbb;">Rating</span></a>
+                    </p>
+                </div>
+                <p class="price">
+                    {% if variant.discounted_price < variant.price %}
+                    <span class="discounted-price">${{ variant.discounted_price }}</span>
+                    <span class="original-price" style="text-decoration: line-through; color: #999;">${{ variant.price }}</span>
+                    {% else %}
+                    <span class="original-price">${{ variant.price }}</span>
+                    {% endif %}
+                </p>
+                <p>{{ variant.product.description }}</p>
+                <div class="row mt-4">
+                    <div class="input-group col-md-6 d-flex mb-3">
+                        <span class="input-group-btn mr-2">
+                            <button type="button" class="quantity-left-minus btn" data-type="minus" data-field="">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </span>
+                        <input type="text" id="quantity" name="quantity" class="quantity form-control input-number" value="1" min="1" max="{{ 5 }}">
+                        <span class="input-group-btn ml-2">
+                            <button type="button" class="quantity-right-plus btn" data-type="plus" data-field="">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </span>
+                    </div>
+                    <!-- Dropdown menu to select variant based on volume -->
+                    <div class="input-group col-md-6 d-flex mb-3">
+                        <select id="variant-select" class="form-control">
+                            {% for var in variants %}
+                            <option value="{{ var.id }}" {% if var.id == variant.id %}selected{% endif %} {% if var.stock == 0 %}disabled{% endif %}>
+                                {{ var.name }} - {{ var.volume }} ml {% if var.stock == 0 %}(Out of Stock){% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                <p class="variant-details">Age: <span class="age">{{ variant.age }}</span>, Proof: <span class="proof">{{ variant.proof }}</span>, Volume: <span class="volume">{{ variant.volume }}</span></p>
+                <div class="w-100"></div>
+                <div class="col-md-12">
+                    <p style="color: #000;"><span class="stock">{{ variant.stock }}</span> pieces available</p>
+                </div>
+                {% if all_variant_stock == 0 %}
+                <p style="color: #ff0000;">Out of Stock</p>
+                {% else %}
+                <p>
+                    <button class="btn btn-primary py-3 px-5 mr-2" id="addToCartButton" onclick="addToCart($('#variant-select').val())">Add to Cart</button>
+                    <button class="btn btn-primary py-3 px-5" id="addToWishlistButton" onclick="addToWishlist($('#variant-select').val())">Add to Wishlist</button>
+                </p>
+                {% endif %}
+            </div>
+            {% else %}
+            <!-- Variant is unavailable message -->
+            <div class="col-lg-12 ftco-animate">
+                <p>This variant is currently unavailable. Please contact support for more information.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+<!-- CSRF token -->
+<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
 {% endblock content %}
 
 {% block scripts %}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    console.log('Variants:', '{{ variants|safe }}');
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const variantSelect = document.getElementById('variant-select');
-        const variants = JSON.parse('{{ variants|safe }}');
-   
-        variantSelect.addEventListener('change', function() {
-            const variantId = this.value;
-            const selectedVariant = variants.find(variant => variant.id == variantId);
-            console.log(selectedVariant);
-            // Update product details based on selected variant
-            document.querySelector('.price span').textContent = '$' + selectedVariant.fields.price; // Update to access fields
-            document.querySelector('.stock').textContent = selectedVariant.fields.stock + ' pieces available'; // Update to access fields
 
-            // Update variant details like age, proof, volume, etc.
-            document.querySelector('.age').textContent = selectedVariant.fields.age; // Update to access fields
-            document.querySelector('.proof').textContent = selectedVariant.fields.proof; // Update to access fields
-            document.querySelector('.volume').textContent = selectedVariant.fields.volume; // Update to access fields
+<script>
+    function addToCart(variantId) {
+        var quantity = parseInt($('#quantity').val());
+        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();  // Fetch the CSRF token from the hidden input
+        $.ajax({
+            url: `/cart/add_to_cart/${variantId}/`,
+            type: 'POST',
+            data: {
+                'quantity': quantity,
+                'csrfmiddlewaretoken': csrfToken  // Include CSRF token in the data
+            },
+            dataType: 'json',
+            success: function(data) {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Quantity limit is 5.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    }
 
-            // Additional logic as needed
+    $(document).ready(function() {
+        $('.thumbnail').click(function(e) {
+            e.preventDefault();
+            var imageUrl = $(this).find('img').attr('src');
+            $('.main-product-image a').attr('href', imageUrl); // Update href of main image's anchor tag
+            $('.main-image').attr('src', imageUrl); // Update src of main image
+        });
+
+        // Function to update variant details when a new variant is selected
+        $('#variant-select').change(function() {
+            var variantId = $(this).val();
+            $.ajax({
+                url: `/get_variant_details/${variantId}/`,
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    if (!data.error) {
+                        // Update variant details in the UI
+                        $('.product-details h3').text(data.name);
+                        $('.main-image').attr('src', data.main_image_url);
+        
+                        // Update the price display based on whether there is a discount
+                        if (data.discounted_price < data.original_price) {
+                            $('.price').html(
+                                `<span class="discounted-price">$${data.discounted_price.toFixed(2)}</span>
+                                 <span class="original-price" style="text-decoration: line-through; color: #999;">$${data.original_price.toFixed(2)}</span>`
+                            );
+                        } else {
+                            $('.price').html(`<span class="original-price">$${data.original_price.toFixed(2)}</span>`);
+                        }
+        
+                        // Update other variant details
+                        $('.age').text(data.age);
+                        $('.proof').text(data.proof);
+                        $('.volume').text(data.volume + ' ml');
+                        $('.stock').text(data.stock);
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'An error occurred while fetching variant details.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'An error occurred while fetching variant details.',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }); 
+
+        $('.quantity-left-minus').click(function(e) {
+            e.preventDefault();
+            var quantity = parseInt($('#quantity').val());
+            if (quantity > 1) {
+                $('#quantity').val(quantity - 1);
+            }
+        });
+
+        $('.quantity-right-plus').click(function(e) {
+            e.preventDefault();
+            var stock = parseInt($('.stock').text());
+            var quantity = parseInt($('#quantity').val());
+            if (quantity < 5 && quantity < stock) {
+                $('#quantity').val(quantity + 1);
+            } else {
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Quantity limit is 5 and only ' + stock + ' items left in stock',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
         });
     });
+
+    function addToWishlist(variantId) {
+        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();  // Fetch the CSRF token from the hidden input
+        $.ajax({
+            url: `/wishlist/add_to_wishlist/${variantId}/`,
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': csrfToken  // Include CSRF token in the data
+            },
+            dataType: 'json',
+            success: function(data) {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: data.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while adding to wishlist.',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        });
+    }
 </script>
 {% endblock scripts %}

@@ -3,7 +3,17 @@
 {% load static %}
 
 {% block content %}
-
+    <section class="hero-wrap hero-wrap-2" style="background-image: url('{% static 'user_side/images/bg_2.jpg' %}');" data-stellar-background-ratio="0.5">
+      <div class="overlay"></div>
+      <div class="container">
+        <div class="row no-gutters slider-text align-items-end justify-content-center">
+          <div class="col-md-9 ftco-animate mb-5 text-center">
+            <p class="breadcrumbs mb-0"><span class="mr-2"><a href="{% url 'home' %}">Home <i class="fa fa-chevron-right"></i></a></span> <span>Products <i class="fa fa-chevron-right"></i></span></p>
+            <h2 class="mb-0 bread">Products</h2>
+          </div>
+        </div>
+      </div>
+    </section>
   
     <section class="ftco-section">
 			<div class="container">
@@ -11,44 +21,70 @@
 					<div class="col-md-9">
 						<div class="row mb-4">
 							<div class="col-md-12 d-flex justify-content-between align-items-center">
-								<h4 class="product-select">Select Types of Products</h4>
-								<select class="selectpicker" multiple>
-				          <option>Brandy</option>
-				          <option>Gin</option>
-				          <option>Rum</option>
-				          <option>Tequila</option>
-				          <option>Vodka</option>
-				          <option>Whiskey</option>
-				        </select>
+								<h4 class="product-select">Filtre out Products</h4>
+                <form method="get">
+                    <select name="sort" class="form-select" onchange="this.form.submit()">
+                      <option value="" {% if not sort %}selected{% endif %}>Select</option>
+                      <option value="price_low_high" {% if sort == 'price_low_high' %}selected{% endif %}>Price: Low to High</option>
+                      <option value="price_high_low" {% if sort == 'price_high_low' %}selected{% endif %}>Price: High to Low</option>
+                      <option value="name_a_z" {% if sort == 'name_a_z' %}selected{% endif %}>Name: Aa - Zz</option>
+                      <option value="name_z_a" {% if sort == 'name_z_a' %}selected{% endif %}>Name: Zz - Aa</option>
+                      <option value="featured" {% if sort == 'featured' %}selected{% endif %}>Featured</option>
+                      <option value="new_arrivals" {% if sort == 'new_arrivals' %}selected{% endif %}>New Arrivals</option>
+                      <!-- Add other sorting options here -->
+                    </select>
+                </form>
 							</div>
 						</div>
+            
 						<div class="row">
-                            <!--Product list-->
-                            {% for product in products %}
-							<div class="col-md-4 d-flex">
-								<div class="product ftco-animate">
-                                    {% if product.image %}
-									<div class="img d-flex align-items-center justify-content-center" style="background-image: url('{{ product.image.url }}');">
-										<div class="desc">
-											<p class="meta-prod d-flex">
-												<a href="#" class="d-flex align-items-center justify-content-center"><span class="flaticon-shopping-bag"></span></a>
-												<a href="#" class="d-flex align-items-center justify-content-center"><span class="flaticon-heart"></span></a>
-												<a href="#" class="d-flex align-items-center justify-content-center"><span class="flaticon-visibility"></span></a>
-											</p>
-										</div>
-									</div>
-                                    {% endif %}
-									<div class="text text-center">
-										<span class="sale">Sale</span>
-										<span class="category">{{ product.category.category_name }}</span>
-										<h2>{{ product.product_name }}</h2>
-                                        {% if product.variants.all %}
-										<p class="mb-0"><span class="price">$ {{ product.variants.first.price }}</span></p>
-                                        {% endif %}
-									</div>
-								</div>
-							</div>
-                            {% endfor %}
+    <!--Product list-->
+    {% for product in products %}
+        {% if not product.category.is_deleted %}  {# Check if the product's category is listed #}
+            <div class="col-md-4 d-flex">
+                <div class="product ftco-animate">
+                    {% if product.image %}
+                        <div class="img d-flex align-items-center justify-content-center" style="background-image: url('{{ product.image.url }}');">
+                            <div class="desc">
+                                <p class="meta-prod d-flex">
+                                  {% if product.variants.first.stock > 0 %}
+                                    <a class="d-flex align-items-center justify-content-center add-to-cart" data-variant-id="{{ product.variants.first.id }}"><span class="flaticon-shopping-bag"></span></a>
+                                  {% endif %}
+                                    <a href="#" class="d-flex align-items-center justify-content-center"><span class="flaticon-heart"></span></a>
+                                    <a href="{% if product.variants.first %}{% url 'product_detail' product_id=product.variants.first.id %}{% endif %}" class="d-flex align-items-center justify-content-center"><span class="flaticon-visibility"></span></a>
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="text text-center">
+                        {% if product.featured%}
+                          <span class="seller">Featured</span>
+                        {% else %}
+                          <span class="sale">Sale</span>
+                        {% endif %}
+                        <span class="category">{{ product.category.category_name }}</span>
+                        <h2>{{ product.product_name }}</h2>
+                        {% if product.variants.exists %}
+                          {% if sort == 'price_low_high' %}
+                          <span class="price price-sale">${{ product.variants.discounted_price }}</span>
+                              <p class="mb-0">Price: $ {{ product.min_price|default:"N/A" }}</p>
+                            {% elif sort == 'price_high_low' %}
+                            <span class="price price-sale">${{ product.variants.discounted_price }}</span>
+                                <p class="mb-0">Price: $ {{ product.max_price|default:"N/A" }}</p>
+                            {% else %}
+                              {% if variant.discounted_price < variant.price %}
+                                <span class="price price-sale">${{ product.variants.first.price }}</span>
+                                <p class="mb-0">Price: $ {{ product.variants.first.discounted_price }}</p>
+                                {% else %}
+                                <p class="mb-0">Price: $ {{ product.variants.first.price }}</p>
+                                {% endif %}
+                          {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
 						</div>
 						<div class="row mt-5">
 		          <div class="col text-center">
@@ -119,3 +155,39 @@
 		</section>
 
 {% endblock content %}
+
+{% block scripts %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function addToCart(variantId) {
+        var csrfToken = $('input[name="csrfmiddlewaretoken"]').val();  // Fetch the CSRF token from the hidden input
+        $.ajax({
+            url: `/cart/add_to_cart/${variantId}/`,
+            type: 'POST',
+            data: {
+                'csrfmiddlewaretoken': csrfToken  // Include CSRF token in the data
+            },
+            dataType: 'json',
+            success: function(data) {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    alert(data.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+    }
+
+    $(document).ready(function() {
+        $('.add-to-cart').click(function(e) {
+            e.preventDefault();
+            var variantId = $(this).data('variant-id');
+            addToCart(variantId);
+        });
+    });
+</script>
+{% endblock scripts %}

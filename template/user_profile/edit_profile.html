@@ -1,0 +1,80 @@
+{% extends "user_profile/user_base.html" %}
+
+{% load static %}
+
+{% block content %}
+    <section class="ftco-section">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">Edit Profile</div>
+    
+                        <div class="card-body">
+                            <form method="post" action="{% url 'accounts:edit_profile' %}"> <!-- Use 'post' method and specify the form -->
+                                {% csrf_token %}
+                                <div class="form-group row">
+                                    <label for="id_first_name" class="col-md-4 col-form-label text-md-right">First Name</label>
+                                    <div class="col-md-6">
+                                        {{ form.first_name }}
+                                        {% for error in form.first_name.errors %}
+                                            <span class="text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label for="id_last_name" class="col-md-4 col-form-label text-md-right">Last Name</label>
+                                    <div class="col-md-6">
+                                        {{ form.last_name }}
+                                        {% for error in form.last_name.errors %}
+                                            <span class="text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="id_username" class="col-md-4 col-form-label text-md-right">User Name</label>
+                                    <div class="col-md-6">
+                                        {{ form.username }}
+                                        {% for error in form.username.errors %}
+                                            <span class="text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label for="id_email" class="col-md-4 col-form-label text-md-right">Email</label>
+                                    <div class="col-md-6">
+                                        {{ form.email }}
+                                        {% for error in form.email.errors %}
+                                            <span class="text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label for="id_phone_number" class="col-md-4 col-form-label text-md-right">Phone Number</label>
+                                    <div class="col-md-6">
+                                        {{ form.phone_number }}
+                                        {% for error in form.phone_number.errors %}
+                                            <span class="text-danger">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+    
+                                <div class="form-group row mb-0">
+                                    <div class="col-md-6 offset-md-4">
+                                        <button type="submit" class="btn btn-primary">
+                                            Update
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    {% endblock content %}

@@ -1,0 +1,218 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Dashboard</h2>
+            <p>Whole data about your business here</p>
+        </div>
+        <div>
+            <a href="{% url 'sales_report' %}" class="btn btn-primary"><i class="text-muted material-icons md-post_add"></i>Sales report</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-primary-light"><i class="text-primary material-icons md-monetization_on"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Revenue</h6>
+                        <span>${{ total_revenue|floatformat:2 }}</span>
+                        <span class="text-sm">Shipping fees are not included</span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-success-light"><i class="text-success material-icons md-local_shipping"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Orders</h6>
+                        <span>{{ total_orders }}</span>
+                        <span class="text-sm">Excluding orders in transit</span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-warning-light"><i class="text-warning material-icons md-qr_code"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Products</h6>
+                        <span>{{ total_products }}</span>
+                        <span class="text-sm">In {{ total_categories }} Categories</span>
+                    </div>
+                </article>
+            </div>
+        </div>
+        {% comment %} <div class="col-lg-3">
+            <div class="card card-body mb-4">
+                <article class="icontext">
+                    <span class="icon icon-sm rounded-circle bg-info-light"><i class="text-info material-icons md-shopping_basket"></i></span>
+                    <div class="text">
+                        <h6 class="mb-1 card-title">Monthly Earning</h6>
+                        <span>$6,982</span>
+                        <span class="text-sm">Based in your local time.</span>
+                    </div>
+                </article>
+            </div>
+        </div> {% endcomment %}
+    </div>
+
+    <div class="row">
+        <div class="col-xl-12 col-lg-12 mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title">Filter Sales Data</h5>
+                <select id="salesFilter" class="form-select" style="width: 200px;">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-xl-8 col-lg-12">
+            <div class="card mb-4">
+                <article class="card-body">
+                    <h5 class="card-title">Sale Statistics</h5>
+                    <canvas id="salesChart" height="120"></canvas>
+                </article>
+            </div>
+        </div>
+        <div class="col-xl-4 col-lg-12">
+            <div class="card mb-4">
+                <article class="card-body">
+                    <h5 class="card-title">Orders by Status</h5>
+                    <canvas id="ordersChart" height="217"></canvas>
+                </article>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
+
+{% block scripts %}
+
+{% csrf_token %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var sales_dates = JSON.parse("{{ sales_dates|escapejs }}");
+        var sales_totals = JSON.parse("{{ sales_totals|escapejs }}");
+        var order_statuses = JSON.parse("{{ order_statuses|escapejs }}");
+        var order_counts = JSON.parse("{{ order_counts|escapejs }}");
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        const csrftoken = getCookie('csrftoken');
+
+        function updateCharts(period) {
+            fetch(`/admin_panel/admin_dashboard/?period=${period}`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched data:', data);
+                salesChart.data.labels = data.sales_dates;
+                salesChart.data.datasets[0].data = data.sales_totals;
+                salesChart.update();
+
+                ordersChart.data.labels = data.order_statuses;
+                ordersChart.data.datasets[0].data = data.order_counts;
+                ordersChart.update();
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+        }
+
+        var ctxSales = document.getElementById('salesChart').getContext('2d');
+        var salesChart = new Chart(ctxSales, {
+            type: 'line',
+            data: {
+                labels: sales_dates,
+                datasets: [{
+                    label: 'Sales',
+                    data: sales_totals,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    fill: true
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        var ctxOrders = document.getElementById('ordersChart').getContext('2d');
+        var ordersChart = new Chart(ctxOrders, {
+            type: 'pie',
+            data: {
+                labels: order_statuses,
+                datasets: [{
+                    label: 'Orders',
+                    data: order_counts,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                }
+            }
+        });
+
+        document.getElementById('salesFilter').addEventListener('change', function () {
+            updateCharts(this.value);
+        });
+
+        updateCharts('daily'); // Load default chart data
+    });
+</script>
+{% endblock scripts %}

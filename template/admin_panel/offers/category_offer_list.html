@@ -1,0 +1,91 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Category Offer List</h2>
+            <p>Create, Edit, and Delete Category Offers</p>
+        </div>
+        <div>
+            <a href="{% url 'category_offer_create' %}" class="btn btn-primary btn-sm rounded">Create Offer</a>
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <article class="itemlist">
+                <div class="row align-items-center">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Offer Name</th>
+                                <th>Category</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Status</th>
+                                <th>Discount Percentage</th>
+                                <th>Action</th>
+                                <!-- Add more columns as needed -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for offer in offers %}
+                                <tr>
+                                    <td>{{ offer.name }}</td>
+                                    <td>{{ offer.category.category_name }}</td>
+                                    <td>{{ offer.start_date }}</td>
+                                    <td>{{ offer.end_date }}</td>
+                                    <td>
+                                        {% if offer.is_active %}
+                                            <span class="badge rounded-pill alert-success">Active</span>
+                                        {% else %}
+                                            <span class="badge rounded-pill alert-danger">Expired</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ offer.discount_percentage }}%</td>
+                                    <td>
+                                        <a href="{% url 'category_offer_update' offer.id %}" class="btn btn-sm font-sm rounded btn-brand">
+                                            <i class="material-icons md-edit"></i> Edit
+                                        </a>
+                                        <form method="post" action="{% url 'category_offer_delete' offer.id %}" class="delete-form" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="button" class="btn btn-sm font-sm rounded btn-danger delete-btn">
+                                                <i class="material-icons md-delete"></i> Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div> <!-- row .// -->
+            </article> <!-- itemlist  .// -->
+        </div> <!-- card-body end// -->
+    </div> <!-- card end//-->
+</section> <!-- content-main end// -->
+{% endblock %}
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.delete-btn').forEach(function(button) {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const form = this.closest('.delete-form');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

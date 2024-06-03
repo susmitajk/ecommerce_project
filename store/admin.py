@@ -1,11 +1,7 @@
 from django.contrib import admin
-from .models import Brand, Type, Product, ProductVariant, ProductImage
-import admin_thumbnails
+from .models import Brand, Type, Product, ProductVariant, ProductImage, Review
 
-# @admin_thumbnails.thumbnail('image')
-# class ProductImageInline(admin.TabularInline):
-#     model = ProductImage
-#     extra = 1
+
 
 
 # Register your models here.
@@ -22,3 +18,4 @@ admin.site.register(Product, ProductAdmin)
 
 admin.site.register(ProductVariant)
 admin.site.register(ProductImage)
+admin.site.register(Review)

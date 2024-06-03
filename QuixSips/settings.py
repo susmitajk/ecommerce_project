@@ -41,17 +41,26 @@ INSTALLED_APPS = [
     'accounts',
     'category',
     'store',
+    'cart',
+    'wishlist',
+    'orders',
+    'coupon_management',
+    'offers',
+    'admin_panel',
     
 ]
 
 MIDDLEWARE = [
+    
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
+    'QuixSips.middleware.BlockUserMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'QuixSips.urls'
@@ -76,6 +85,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'QuixSips.wsgi.application'
 
 AUTH_USER_MODEL = 'accounts.Account'
+
+
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Default authentication backend
@@ -115,13 +126,29 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',  # Set the log level to DEBUG for more verbose output
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    },
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -143,6 +170,7 @@ STATICFILES_DIRS = [
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -155,4 +183,6 @@ EMAIL_HOST_USER = 'b6c1bc442e6a81'
 EMAIL_HOST_PASSWORD = 'd5efe83857afa8'
 EMAIL_PORT = '2525'
 
-
+# Razorpay Settings
+RAZORPAY_KEY_ID = 'rzp_test_Dmvk58kgve2te7'
+RAZORPAY_KEY_SECRET = '6KrQ8WJDEcAwEQmXyr5o38Lh'

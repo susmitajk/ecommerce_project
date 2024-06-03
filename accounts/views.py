@@ -1,13 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .forms import SignUpForm
-from .models import Account
+from .forms import SignUpForm,ProfileEditForm,AddressForm
+from .models import Account,Address, Wallet,WalletTransaction
+from cart.models import Cart, CartItem
 # from django.contrib.auth.hashers import make_password
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate, login, logout
 from .utils import generate_otp, send_otp_email
-from django.http import JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse
 import time
+from orders.models import Order
 
 # Create your views here.
 @never_cache
@@ -40,11 +43,15 @@ def registration(request):
             request.session['user_id'] = user.id
 
             return render(request, 'accounts/user_otp_verify.html', {"email": user.email})
+        else:
+            # Registration failed, pass form data back to template
+            context = {'form': form}
+            messages.error(request, 'Registration failed. Please correct the errors below.')
+            return render(request, 'accounts/user_signup.html', context)
 
     else: 
         form = SignUpForm()
-
-    context = {'form': form}
+        context = {'form': form}
     return render(request, 'accounts/user_signup.html', context)
 
 @never_cache
@@ -230,3 +237,135 @@ def user_logout(request):
     logout(request)
     messages.success(request, 'You have logged out')
     return redirect('home')  
+
+
+# User Profile
+
+@login_required
+def account_dashboard(request):
+    user = request.user   # captures the current user
+    addresses = Address.objects.filter(user=user)
+    
+    try:
+        cart = Cart.objects.get(user=request.user)
+        cart_items = CartItem.objects.filter(cart=cart)
+        total_cart_items = cart_items.count()
+    except Cart.DoesNotExist:
+        cart = None
+        total_cart_items = 0
+    
+    orders = Order.objects.filter(user=request.user).order_by('-created_at') # order sorting in user profile
+
+    try:
+        wallet = Wallet.objects.get(user=request.user)
+        transactions = wallet.transactions.all()
+    except Wallet.DoesNotExist:
+        # Handle the case where Wallet doesn't exist for the user
+        wallet = None
+        transactions = []
+        
+    context = {
+        'user': user,
+        'addresses': addresses,
+        'cart_total': total_cart_items,
+        'orders': orders,
+        'wallet': wallet,
+        'transactions': transactions,
+    }
+    return render(request, 'user_profile/profile.html', context)
+
+
+# Edit user profile
+@login_required
+def edit_profile(request):
+    user = request.user
+    if request.method == 'POST':
+        print("Form data received:", request.POST)  # Print form data for debugging
+        form = ProfileEditForm(request.POST, instance=user)  # Initialize the form with request.POST data and instance=user
+        
+        if form.is_valid():
+            form.save()  # Save the form data to update the user profile
+            return redirect('accounts:account_dashboard')
+        else:
+            print(form.errors)      # debugging
+    else:
+        form = ProfileEditForm(instance=user)  # Initialize the form with the current user's data
+    return render(request, 'user_profile/edit_profile.html', {'form': form})
+
+
+# Address CRUD
+
+# Address creation
+@login_required
+def create_address(request):
+    next_url = request.GET.get('next', None)
+    
+    if request.method == 'POST':
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.user = request.user
+            if request.POST.get('is_default') == 'on':
+                address.is_default = True
+                Address.objects.filter(user=request.user).exclude(id=address.id).update(is_default=False)
+            address.save()
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('accounts:account_dashboard')
+    else:
+        form = AddressForm()
+    
+    return render(request, 'user_profile/create_address.html', {'form': form})
+
+# Address Updation
+@login_required
+def edit_address(request, address_id):
+    next_url = request.GET.get('next', None)
+    
+    address = get_object_or_404(Address, id=address_id)
+    
+    if request.method == 'POST':
+        form = AddressForm(request.POST, instance=address)
+        if form.is_valid():
+            form.save()
+            if request.POST.get('default_address') == 'on':
+                address.is_default = True
+                Address.objects.filter(user=request.user).exclude(id=address.id).update(is_default=False)
+                address.save()
+            else:
+                address.is_default = False
+                address.save()
+            if next_url:
+                return redirect(next_url)
+            else:
+                return redirect('accounts:account_dashboard')
+    else:
+        form = AddressForm(instance=address)
+    
+    return render(request, 'user_profile/edit_address.html', {'form': form, 'address': address})
+
+
+
+# Address Deletion
+@login_required
+def delete_address(request, address_id):
+    # Ensure the user is authenticated
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden("Authentication required to delete the address.")
+
+    # Retrieve the Address object from the Address model using the address_id
+    address = get_object_or_404(Address, id=address_id)
+    # Check if the user requesting the deletion is the owner of the address
+    if address.user == request.user:
+        # If the request method is POST, delete the address
+        if request.method == 'POST':
+            address.delete()
+            # messages.success(request, 'Address deleted successfully.')
+            return redirect('accounts:account_dashboard')
+        else:
+            # Handle unauthorized access (optional)
+            return HttpResponseForbidden("You are not authorized to delete this address.")
+    else:
+        # Handle unauthorized access (optional)
+        return HttpResponseForbidden("You are not authorized to delete this address.")

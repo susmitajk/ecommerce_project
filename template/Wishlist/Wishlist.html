@@ -1,0 +1,153 @@
+{% extends "Wishlist/Wishlist_base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="ftco-section">
+    <div class="container">
+        <div class="row">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead class="thead-primary">
+                        <tr>
+                            <th>&nbsp;</th>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in wishlist_items %}
+                        <tr class="wishlist-item" data-item-id="{{ item.variant.id }}">
+                            <td>
+                                <div class="img" style="background-image: url({{ item.get_variant_image.url }}); height: 100px; width: 100px;"></div>
+                            </td>
+                            <td>
+                                <div class="email">
+                                    <span>{{ item.variant.name }}</span>
+                                    <span>{{ item.variant.product.description }}</span>
+                                </div>
+                            </td>
+                            <td>${{ item.variant.price }}</td>
+                            <td>
+                                <button type="button" class="btn btn-primary add-to-cart" data-variant="{{ item.variant.id }}">Add to Cart</button>
+                                <button type="button" class="btn btn-danger remove-from-wishlist" data-variant="{{ item.variant.id }}">Remove</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script>
+    const csrftoken = '{{ csrf_token }}';
+
+    function addToCart(variantId) {
+        fetch(`/cart/add_to_cart/${variantId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Product added to cart',
+                    timer: 2000
+                }).then(() => {
+                    console.log('Product added to cart');
+                    // Optionally, you can redirect to the cart page or update the UI
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: data.message
+                }).then(() => {
+                    console.log('Error adding product to cart');
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to add product to cart'
+            });
+        });
+    }
+
+    function removeFromWishlist(variantId) {
+        fetch(`/wishlist/remove_from_wishlist/${variantId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Remove the item from the DOM
+                const row = document.querySelector(`.wishlist-item[data-item-id="${variantId}"]`);
+                if (row) {
+                    row.remove();
+                }
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Product removed from wishlist',
+                    timer: 2000
+                }).then(() => {
+                    console.log('Product removed from wishlist');
+                });
+            } else {
+                // Show error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: data.message
+                }).then(() => {
+                    console.log('Error removing product from wishlist');
+                });
+            }
+        })
+        .catch(error => {
+            // Show error message
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: 'Failed to remove product from wishlist'
+            });
+        });
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        const wishlistTable = document.querySelector('.table');
+    
+        wishlistTable.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target.classList.contains('add-to-cart')) {
+                const variantId = target.getAttribute('data-variant');
+                addToCart(variantId);
+            } else if (target.classList.contains('remove-from-wishlist')) {
+                const variantId = target.getAttribute('data-variant');
+                removeFromWishlist(variantId);
+            }
+        });
+    });
+</script>
+{% endblock scripts %}

@@ -1,0 +1,67 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Order List</h2>
+            <p>Update Order status and Cancel Order.</p>
+        </div>
+        <div>
+            <!-- Add any additional buttons or actions here -->
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <article class="itemlist">
+                <div class="row align-items-center">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>User</th>
+                                <th>Total Price</th>
+                                <th>Payment Method</th>
+                                <th>Status</th>
+                                <th>Return Status</th>
+                                <th>Actions</th>
+                                <!-- Add more columns as needed -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td>{{ order.uuid }}</td>
+                                    <td>{{ order.user }}</td>
+                                    <td>{{ order.total_price }}</td>
+                                    <td>{{ order.payment_method }}</td>
+                                    <td>{{ order.status }}</td>
+                                    <td>{{ order.return_status }}</td>
+                                    <td>
+                                        {% if order.status != 'Cancelled' %}
+                                            {% if order.status == 'Delivered' %}
+                                                {% if order.return_status == 'Requested' %}
+                                                    <a href="{% url 'review_return' order.uuid %}" class="btn btn-sm font-sm rounded btn-brand">Review Return</a>
+                                                {% elif order.return_status == 'Approved' or order.return_status == 'Not Requested' or order.return_status == 'Rejected' %}
+                                                    <a href="{% url 'view_order' order.uuid %}" class="btn btn-sm font-sm rounded btn-brand">View</a>
+                                                {% endif %}
+                                            {% else %}
+                                                <form action="{% url 'edit_order' order.uuid %}" method="post">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm font-sm rounded btn-brand">Edit</button>
+                                                </form>
+                                            {% endif %}
+                                        {% else %}
+                                            <a href="{% url 'view_order' order.uuid %}" class="btn btn-sm font-sm rounded btn-brand">View</a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div> <!-- row .// -->
+            </article> <!-- itemlist  .// -->
+        </div> <!-- card-body end// -->
+    </div> <!-- card end//-->
+</section> <!-- content-main end// -->
+{% endblock %}

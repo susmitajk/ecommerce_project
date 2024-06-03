@@ -1,0 +1,60 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load static %}
+{% block content %}
+        <section class="content-main">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                    <div class="row">
+                        <div class="col-9">
+                            <div class="content-header">
+                                <h2 class="content-title">Edit Product Variant Images</h2>
+                                <div>
+                                        <button class="btn btn-md rounded font-sm hover-up">Save changes</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <div class="mb-4">
+                                        <label for="{{ form.variant.id_for_label }}" class="form-label">Product Variant</label>
+                                        {{ form.variant }}
+                                    </div>
+                                    <div class="mb-4">
+                                        <label for="{{ form.image.id_for_label }}" class="form-label">Image</label>
+                                        {{ form.image }}
+                                    </div>
+                                    <!-- <div class="mb-4">
+                                        <label for="product_brand" class="form-label">Brand</label>
+                                        <input type="text" placeholder="Type here" class="form-control" id="product_brand">
+                                    </div> -->
+                                </div>
+                            </div> <!-- card end// -->
+                            {% comment %} <div class="card mb-4">
+                                <div class="card-body">
+                                    <div>
+                                        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                                        {{ form.description }}
+                                    </div>
+                                </div>
+                            </div> <!-- card end// --> {% endcomment %}
+                            {% comment %} <div class="card mb-4">
+                                <div class="card-body">
+                                    <div>
+                                        <label for="{{ form.image.id_for_label }}" class="form-label">Images</label>
+                                        {{ form.image }}
+                                    </div>
+                                </div>
+                            </div> <!-- card end// --> {% endcomment %}
+                        </div>
+                        
+                    </div>
+            </form>
+        </section>
+        <!-- 
+            To provide a dynamic user experience where users can see the slug being generated in real-time 
+            as they type the product name
+        -->
+        
+{% endblock %}
+

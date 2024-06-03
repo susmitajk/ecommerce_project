@@ -1,0 +1,159 @@
+{% extends "user_profile/user_base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<section class="ftco-section">
+<div class="account-dashboard">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-md-3 col-lg-3">
+                <!-- Nav tabs -->
+                <div class="dashboard_tab_button" data-aos="fade-up" data-aos-delay="0">
+                    <ul role="tablist" class="nav flex-column dashboard-list">
+                        <li><a href="#dashboard" data-toggle="tab" class="nav-link btn btn-block btn-md btn-black-default-hover active">Dashboard</a></li>
+                        <li><a href="#orders" data-toggle="tab" class="nav-link btn btn-block btn-md btn-black-default-hover">Orders</a></li>
+                        <li><a href="#wallet" data-toggle="tab" class="nav-link btn btn-block btn-md btn-black-default-hover">Wallet</a></li>
+                        <li><a href="#address" data-toggle="tab" class="nav-link btn btn-block btn-md btn-black-default-hover">Addresses</a></li>
+                        <li><a href="#account-details" data-toggle="tab" class="nav-link btn btn-block btn-md btn-black-default-hover">Account details</a></li>
+                        <li><a href="login.html" class="nav-link btn btn-block btn-md btn-black-default-hover">logout</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-sm-12 col-md-9 col-lg-9">
+                <!-- Tab panes -->
+                <div class="tab-content dashboard_content" data-aos="fade-up" data-aos-delay="200">
+                    <div class="tab-pane fade show active" id="dashboard">
+                        <h4>User Info </h4>
+                        <p>First Name: {{ user.first_name }}</p>
+                        <p>Last Name: {{ user.last_name }}</p>
+                        <p>User Name: {{ user.username }}</p>
+                        <p>Email: {{ user.email }}</p>
+                        <p>Phone Number: {{ user.phone_number }}</p>
+                    </div>
+                    <div class="tab-pane fade" id="orders">
+                        <h4>Orders</h4>
+                        <div class="table_page table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="thead-primary">
+                                    <tr>
+                                        <th>Order</th>
+                                        <th>Date</th>
+                                        <th>Order Status</th>
+                                        <th>Return Status</th>
+                                        <th>Total</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td>{{ order.uuid }}</td>
+                                        <td>{{ order.created_at|date:"F d, Y" }}</td>
+                                        {% if order.status == 'Cancelled' %}
+                                                <td><span class="badge bg-danger">{{ order.status }}</span></td>
+                                            {% elif  order.status == 'Delivered'  %}
+                                                <td><span class="badge bg-success">{{ order.status }}</span></td>
+                                            {% else %}
+                                                <td><span class="badge bg-warning">{{ order.status }}</span></td>
+                                        {% endif %}
+                                        <td>{{ order.return_status }}</td>
+                                        <td>${{ order.total_price }}</td>
+                                        <td>
+                                            
+                                            <a href="{% url 'order_detail' order_id=order.uuid %}" class="btn btn-sm btn-primary">View</a>
+                                            {% if order.status == 'Delivered' and  order.return_status == 'Not Requested' %}
+                                                <form method="post" action="{% url 'return_order' order_id=order.uuid %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-warning">Return</button>
+                                                </form>
+                                            {% elif order.status == 'Pending' or order.status == 'Confirmed' or order.status == 'Shipped' and order.return_status == 'Not Requested' %}
+                                                <form method="post" action="{% url 'cancel_order' order_id=order.uuid %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-danger">Cancel</button>
+                                                </form>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="wallet">
+                        <h4>Your Wallet</h4>
+                        {% if wallet %}
+                            <p>Current Balance: ${{ wallet.balance }}</p>
+                            {% else %}
+                            <p>Current Balance: N/A <i>( will be filled in your first order return )</i></p>
+                            <p><i> Doesn't works with Cash On Dilevery </i></p>
+                        {% endif %}
+                        <div class="table_page table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="thead-primary">
+                                    <tr>
+                                        <th>Transaction Type</th>
+                                        <th>Amount</th>
+                                        <th>Date</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in transactions %}
+                                    <tr>
+                                        <td>{{ transaction.transaction_type }}</td>
+                                        <td>${{ transaction.amount }}</td>
+                                        <td>{{ transaction.timestamp|date:"F d, Y" }}</td>
+                                        <td>{{ transaction.description }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="address">
+                        <p class="lead">The following addresses will be used on the checkout page by default.</p>
+                        <a href="{% url 'accounts:create_address' %}" class="btn btn-primary ">New Address</a>
+                        <hr/>
+                        {% for address in addresses %}
+                        <div class="address-info">
+                            <h5 class="billing-address">Billing Address</h5>
+                            
+                            <div class="address-details">
+                                <p><strong>{{ address.user.first_name }} {{ address.user.last_name }}</strong></p>
+                                <address>
+                                    {{ address.address_line_1 }}<br>
+                                    {{ address.address_line_2 }}<br>
+                                    {{ address.city }}, {{ address.state }}, {{ address.country }}<br>
+                                    {{ address.postal_code }}<br>
+                                    {% if address.is_default %}
+                                            <span class="text-success">Default Address</span><br>
+                                        {% endif %}
+                                </address>
+                                <a href="{% url 'accounts:edit_address' address.id %}" class="btn btn-primary">Edit</a><hr/>
+                                <form method="post" action="{% url 'accounts:delete_address' address.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="tab-pane fade" id="account-details">
+                        <h3>Account details </h3>
+                        <div class="login">
+                            <div class="login_form_container">
+                                <div class="account_login_form">
+                                    <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary">Edit Profile</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
+</section>
+{% endblock content %}

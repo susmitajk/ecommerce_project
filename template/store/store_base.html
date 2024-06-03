@@ -20,6 +20,7 @@
     
     <link rel="stylesheet" href="{% static 'user_side/css/flaticon.css' %}">
     <link rel="stylesheet" href="{% static 'user_side/css/style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.min.css" rel="stylesheet">
   </head>
   <body>
 
@@ -42,8 +43,28 @@
 			    		</p>
 		        </div>
 		        <div class="reg">
-		        	<p class="mb-0"><a href="#" class="mr-2">Sign Up</a> <a href="#">Log In</a></p>
-		        </div>
+              {% if user.is_authenticated %}
+                {% if user.is_admin %}
+                  <!-- If user is authenticated (logged in) and admin -->
+                  <p class="mb-0">
+                    <a href="{% url 'dashboard' %}" class="mr-2">{{ user.username }}</a>
+                    <a href="{% url 'accounts:logout' %}">Logout</a>
+                  </p>
+                {% else %}
+                  <!-- If user is authenticated (logged in) but not admin -->
+                  <p class="mb-0">
+                    <a href="#" class="mr-2">{{ user.username }}</a>
+                    <a href="{% url 'accounts:logout' %}">Logout</a>
+                  </p>
+                {% endif %}
+              {% else %}
+                <!-- If user is not authenticated (logged out) -->
+                <p class="mb-0">
+                  <a href="{% url 'accounts:register' %}" class="mr-2">Sign Up</a>
+                  <a href="{% url 'accounts:login' %}">Log In</a>
+                </p>
+              {% endif %}
+            </div>
 					</div>
 				</div>
 			</div>
@@ -51,39 +72,12 @@
     
 	  <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
 	    <div class="container">
-	      <a class="navbar-brand" href="index.html">Liquor <span>store</span></a>
+	      <a class="navbar-brand" href="{% url 'home' %}">Liquor <span>store</span></a>
 	      <div class="order-lg-last btn-group">
-          <a href="#" class="btn-cart dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          	<span class="flaticon-shopping-bag"></span>
-          	<div class="d-flex justify-content-center align-items-center"><small>3</small></div>
+          <a href="{% url 'cart' %}" class="btn-cart">
+          	<span class="flaticon-shopping-bag"></span>&nbsp;&nbsp;&nbsp;
+          	<div class="d-flex justify-content-center align-items-center"><small>{{ cart_total }}</small></div>
           </a>
-          <div class="dropdown-menu dropdown-menu-right">
-				    <div class="dropdown-item d-flex align-items-start" href="#">
-				    	<div class="img" style="background-image: url(images/prod-1.jpg);"></div>
-				    	<div class="text pl-3">
-				    		<h4>Bacardi 151</h4>
-				    		<p class="mb-0"><a href="#" class="price">$25.99</a><span class="quantity ml-3">Quantity: 01</span></p>
-				    	</div>
-				    </div>
-				    <div class="dropdown-item d-flex align-items-start" href="#">
-				    	<div class="img" style="background-image: url(images/prod-2.jpg);"></div>
-				    	<div class="text pl-3">
-				    		<h4>Jim Beam Kentucky Straight</h4>
-				    		<p class="mb-0"><a href="#" class="price">$30.89</a><span class="quantity ml-3">Quantity: 02</span></p>
-				    	</div>
-				    </div>
-				    <div class="dropdown-item d-flex align-items-start" href="#">
-				    	<div class="img" style="background-image: url(images/prod-3.jpg);"></div>
-				    	<div class="text pl-3">
-				    		<h4>Citadelle</h4>
-				    		<p class="mb-0"><a href="#" class="price">$22.50</a><span class="quantity ml-3">Quantity: 01</span></p>
-				    	</div>
-				    </div>
-				    <a class="dropdown-item text-center btn-link d-block w-100" href="cart.html">
-				    	View All
-				    	<span class="ion-ios-arrow-round-forward"></span>
-				    </a>
-				  </div>
         </div>
 
 	      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
@@ -93,7 +87,8 @@
 	      <div class="collapse navbar-collapse" id="ftco-nav">
 	        <ul class="navbar-nav ml-auto">
 	          <li class="nav-item"><a href="{% url 'home' %}" class="nav-link">Home</a></li>
-	          <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
+	          <li class="nav-item"><a href="{% url 'accounts:account_dashboard' %}" class="nav-link">User</a></li>
+            <li class="nav-item"><a href="{% url 'wishlist' %}" class="nav-link">Wishlist</a></li>
 	          <li class="nav-item dropdown active">
               <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Products</a>
               <div class="dropdown-menu" aria-labelledby="dropdown04">
@@ -102,25 +97,15 @@
 				        {% endfor %}
               </div>
             </li>
-	          <li class="nav-item	"><a href="blog.html" class="nav-link">Blog</a></li>
-	          <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+	          {% comment %} <li class="nav-item	"><a href="blog.html" class="nav-link">Blog</a></li>
+	          <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li> {% endcomment %}
 	        </ul>
 	      </div>
 	    </div>
 	  </nav>
     <!-- END nav -->
     
-    <section class="hero-wrap hero-wrap-2" style="background-image: url('{% static 'user_side/images/bg_2.jpg' %}');" data-stellar-background-ratio="0.5">
-      <div class="overlay"></div>
-      <div class="container">
-        <div class="row no-gutters slider-text align-items-end justify-content-center">
-          <div class="col-md-9 ftco-animate mb-5 text-center">
-          	<p class="breadcrumbs mb-0"><span class="mr-2"><a href="index.html">Home <i class="fa fa-chevron-right"></i></a></span> <span>Products <i class="fa fa-chevron-right"></i></span></p>
-            <h2 class="mb-0 bread">Products</h2>
-          </div>
-        </div>
-      </div>
-    </section>
+   
 
     {% block content %}
 
@@ -222,7 +207,7 @@
     <script src="{% static 'user_side/js/google-map.js' %}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
     <script src="{% static 'user_side/js/main.js' %}"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js"></script>
     {% block scripts %}
 
     {% endblock scripts %}

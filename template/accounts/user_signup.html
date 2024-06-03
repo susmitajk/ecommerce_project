@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Register</title>
   
-  <link rel="stylesheet" href="{% static 'user_side/css/styles.css' %}">
+  <link rel="stylesheet" href="{% static 'user_side/css/style.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
   <style>
     /* Back to home link */
     .back-to-home {
@@ -32,7 +33,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh; /* Adjust as needed */
+        min-height: 100vh /* Adjust as needed */
     }
     
     /* Form container */
@@ -178,6 +179,7 @@
             opacity: 0;
         }
     }
+
   </style>
 </head>
 <body>
@@ -188,52 +190,119 @@
         <p class="title">Register</p>
         <p class="message">Signup now and get full access to our app.</p>
         
-        {% if form.errors %}
-          <ul class="error-list">
-          {% for field, errors in form.errors.items %}
-            {% for error in errors %}
-              <li class="error-message">{{ error }}</li>
-            {% endfor %}
-          {% endfor %}
-          </ul>
-        {% endif %}
     
         <label>
-            <input required="" placeholder="" type="text" class="input" name="first_name">
+            <input required="" placeholder="" type="text" class="input" name="first_name" value="{{ form.first_name.value|default_if_none:'' }}">
             <span>Firstname</span>
+            {% if form.first_name.errors %}
+                <ul class="error-list">
+                     {% for error in form.first_name.errors %}
+                        <li class="error-message">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </label>
     
         <label>
-            <input required="" placeholder="" type="text" class="input" name="last_name">
+            <input required="" placeholder="" type="text" class="input" name="last_name" value="{{ form.last_name.value|default_if_none:'' }}">
             <span>Lastname</span>
+            {% if form.last_name.errors %}
+                <ul class="error-list">
+                    {% for error in form.last_name.errors %}
+                        <li class="error-message">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </label>
      
         <label>
-            <input required="" placeholder="" type="text" class="input" name="username">
+            <input required="" placeholder="" type="text" class="input" name="username" value="{{ form.username.value|default_if_none:'' }}">
             <span>Username</span>
+            {% if form.username.errors %}
+                <ul class="error-list">
+                    {% for error in form.username.errors %}
+                        <li class="error-message">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </label>
     
         <label>
-            <input required="" placeholder="" type="email" class="input" name="email">
+            <input required="" placeholder="" type="email" class="input" name="email" value="{{ form.email.value|default_if_none:'' }}">
             <span>Email</span>
+            {% if form.email.errors %}
+            <ul class="error-list">
+                {% for error in form.email.errors %}
+                <li class="error-message">{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         </label> 
         
         <label>
-            <input required="" placeholder="" type="tel" class="input" name="phone_number">
+            <input required="" placeholder="" type="tel" class="input" name="phone_number" value="{{ form.phone_number.value|default_if_none:'' }}">
             <span>Phone</span>
+            {% if form.phone_number.errors %}
+            <ul class="error-list">
+                {% for error in form.phone_number.errors %}
+                <li class="error-message">{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         </label> 
 
         <label>
             <input required="" placeholder="" type="password" class="input" name="password1">
             <span>Password</span>
+            {% if form.password1.errors %}
+            <ul class="error-list">
+                {% for error in form.password1.errors %}
+                <li class="error-message">{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         </label>
         <label>
             <input required="" placeholder="" type="password" class="input" name="password2">
             <span>Confirm password</span>
+            {% if form.password2.errors %}
+            <ul class="error-list">
+                {% for error in form.password2.errors %}
+                <li class="error-message">{{ error }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         </label>
         <button class="submit" type="submit">Register</button>
         <p class="signin">Already have an account? <a href="{% url 'accounts:login' %}">Sign in</a></p>
     </form>
     </div>
+    
+    
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script> 
+   
+    <script>
+        // Initialize Toastify with custom styles
+        {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+                var toast = Toastify({
+                    text: "{{ message }}",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                        background: "red",
+                        color: "white",
+                        padding: "10px 20px",
+                        borderRadius: "5px",
+                        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)"
+                    }
+                });
+                toast.showToast();
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    </script>
 </body>
 </html>

@@ -1,0 +1,77 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load static %}
+{% block content %}
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Sales Report</h2>
+            <p>Filter and download sales reports.</p>
+        </div>
+        <div>
+            <!-- Add any additional buttons or actions here -->
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="mb-4">
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="date_filter" class="form-label">Date Filter</label>
+                        {{ form.date_filter }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="start_date" class="form-label">Start Date</label>
+                        {{ form.start_date }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="end_date" class="form-label">End Date</label>
+                        {{ form.end_date }}
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary mt-3">Generate Report</button>
+            </form>
+
+            <div class="mb-4">
+                <a href="{% url 'download_pdf_report' %}?{{ request.GET.urlencode }}" class="btn btn-outline-primary">Download PDF</a>
+                <a href="{% url 'download_excel_report' %}?{{ request.GET.urlencode }}" class="btn btn-outline-secondary">Download Excel</a>
+            </div> 
+
+            <h2 class="content-title card-title">Report Summary</h2>
+            <p>Total Sales: ${{ total_sales }}</p>
+            <p>Total Discount: ${{ total_discount }}</p>
+            <p>Order Count: {{ order_count }}</p>
+
+            <article class="itemlist">
+                <div class="row align-items-center">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>User</th>
+                                <th>Total Price</th>
+                                <th>Status</th>
+                                <th>Return Status</th>
+                                <th>Coupon Code</th>
+                                <th>Discount Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in orders %}
+                                <tr>
+                                    <td>{{ order.uuid }}</td>
+                                    <td>{{ order.user }}</td>
+                                    <td>{{ order.total_price }}</td>
+                                    <td>{{ order.status }}</td>
+                                    <td>{{ order.return_status }}</td>
+                                    <td>{{ order.coupon_code }}</td>
+                                    <td>{{ order.discount_percentage }}%</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends 'admin_panel/admin_base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<section class="content-main">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-9">
+                <div class="content-header">
+                    <h2 class="content-title">Add New Product Offer</h2>
+                    <div>
+                        <button class="btn btn-md rounded font-sm hover-up">Create</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Offer Name</label>
+                            {{ form.name }}
+                            <span style="color: red;">{{ form.name.errors }}</span>
+                        </div>
+                        <div class="row gx-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date</label>
+                                {{ form.start_date }}
+                                <span style="color: red;">{{ form.start_date.errors }}</span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date</label>
+                                {{ form.end_date }}
+                                <span style="color: red;">{{ form.end_date.errors }}</span>
+                            </div>
+                        </div>
+                        <div class="row gx-5">
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.discount_percentage.id_for_label }}" class="form-label">Discount Percentage</label>
+                                {{ form.discount_percentage }}
+                                <span style="color: red;">{{ form.discount_percentage.errors }}</span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="{{ form.product.id_for_label }}" class="form-label">Product</label>
+                                {{ form.product }}
+                                <span style="color: red;">{{ form.product.errors }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        flatpickr('#id_start_date', {dateFormat: 'Y-m-d'});
+        flatpickr('#id_end_date', {dateFormat: 'Y-m-d'});
+    });
+</script>
+{% endblock %}
