@@ -4,9 +4,9 @@ from category.models import Category
 from django.http import JsonResponse
 from cart.models import Cart, CartItem
 from django.views.decorators.cache import never_cache
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-
-from django.db.models import Min, Max
+from django.db.models import Min, Max,Q
 from django.db.models.functions import Lower
 
 # homepage
@@ -38,6 +38,8 @@ def product_list(request, category_slug=None):
     categories = None
     products = None
     sort = request.GET.get('sort')
+    search_query = request.GET.get('q', '')  # Get the search query
+    page = request.GET.get('page', 1)  # Get the page number
 
     total_cart_items = 0
     if request.user.is_authenticated:
@@ -47,12 +49,28 @@ def product_list(request, category_slug=None):
             total_cart_items = cart_items.count()
         except Cart.DoesNotExist:
             total_cart_items = 0  # Handle the case when Cart does not exist for the user
-
+    
     if category_slug:
         categories = get_object_or_404(Category, slug=category_slug)
         products = Product.objects.filter(category=categories, is_deleted=False)
     else:
         products = Product.objects.filter(is_deleted=False)
+
+     # Apply search filter
+    if search_query:
+        search_filter = (
+            Q(product_name__icontains=search_query) |
+            Q(description__icontains=search_query) |
+            Q(brand__name__icontains=search_query) |
+            Q(liquor_type__name__icontains=search_query) |
+            Q(variants__name__icontains=search_query)
+        )
+        
+        # If category is specified, filter products by category and search query
+        if category_slug:
+            products = products.filter(category=categories).filter(search_filter)
+        else:
+            products = products.filter(search_filter).distinct()
     
     # Sorting based on the selected option
     if sort == 'price_low_high':
@@ -68,10 +86,22 @@ def product_list(request, category_slug=None):
     elif sort == 'new_arrivals':
         products = products.order_by('-id')
     
+    # Paginate the products
+    paginator = Paginator(products, 9)  # Show 9 products per page
+    try:
+        products = paginator.page(page)
+    except PageNotAnInteger:
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+    
     context = {
         'products': products,
         'cart_total': total_cart_items,
         'sort': sort,
+        'paginator': paginator,
+        'search_query': search_query,
+        'selected_category': categories, 
     }
     return render(request, 'store/product_list.html', context)
 

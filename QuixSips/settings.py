@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,12 +22,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-rr+&c=id9x=z&9f80uu!pa@*rsid^pz)2efb#tj!ksqc9(q-ga'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -98,12 +99,12 @@ AUTHENTICATION_BACKENDS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ecomdb',      # Name of your PostgreSQL database
-        'USER': 'postgres',        # Your PostgreSQL username
-        'PASSWORD': 'susmita123',# Your PostgreSQL password
-        'HOST': 'localhost',   # Host where PostgreSQL server is running
-        'PORT': '5432',        # Port where PostgreSQL server is running
+        'ENGINE': config('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': config('DB_NAME'),      # Name of your PostgreSQL database
+        'USER': config('DB_USER'),       # Your PostgreSQL username
+        'PASSWORD': config('DB_PASSWORD'),# Your PostgreSQL password
+        'HOST': config('DB_HOST'),   # Host where PostgreSQL server is running
+        'PORT': config('DB_PORT'),       # Port where PostgreSQL server is running
     }
 }
 
@@ -177,12 +178,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email Settings
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = 'b6c1bc442e6a81'
-EMAIL_HOST_PASSWORD = 'd5efe83857afa8'
-EMAIL_PORT = '2525'
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
 
 # Razorpay Settings
-RAZORPAY_KEY_ID = 'rzp_test_Dmvk58kgve2te7'
-RAZORPAY_KEY_SECRET = '6KrQ8WJDEcAwEQmXyr5o38Lh'
+RAZORPAY_KEY_ID = config('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = config('RAZORPAY_KEY_SECRET')

@@ -28,7 +28,13 @@
                                     <span>{{ item.variant.product.description }}</span>
                                 </div>
                             </td>
-                            <td>${{ item.variant.price }}</td>
+                            <td>{% if item.variant.discounted_price < item.variant.price %}
+                                <span class="discounted-price">${{ item.variant.discounted_price }}</span>
+                                <span class="original-price" style="text-decoration: line-through; color: #999;">${{ item.variant.price }}</span>
+                                {% else %}
+                                <span class="original-price">${{ item.variant.price }}</span>
+                                {% endif %}
+                                {% comment %} ${{ item.variant.price }} {% endcomment %}</td>
                             <td>
                                 <button type="button" class="btn btn-primary add-to-cart" data-variant="{{ item.variant.id }}">Add to Cart</button>
                                 <button type="button" class="btn btn-danger remove-from-wishlist" data-variant="{{ item.variant.id }}">Remove</button>

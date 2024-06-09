@@ -104,6 +104,13 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <div class="radio">
+                                    <label><input type="radio" name="payment_method" value="wallet" class="mr-2"> Wallet Payment</label>
+                                </div>
+                            </div>
+                        </div>
                         <p><button type="submit" id="place-order-btn" class="btn btn-primary py-3 px-4">Place Order</button></p>
                     </div>
                 </div>
@@ -122,6 +129,16 @@
         const radioButtons = document.querySelectorAll('input[name="address"]');
         const placeOrderBtn = document.getElementById('place-order-btn');
         const checkoutForm = document.getElementById('checkout-form');
+
+                // Function to show SweetAlert2
+            function showAlert(message, type) {
+                Swal.fire({
+                    title: type === 'error' ? 'Error!' : 'Success!',
+                    text: message,
+                    icon: type,
+                    confirmButtonText: 'OK'
+                });
+            }
     
         radioButtons.forEach(radioButton => {
             radioButton.addEventListener('change', function() {
@@ -131,7 +148,7 @@
                 }
             });
         });
-    
+        
         placeOrderBtn.addEventListener('click', function(event) {
             const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
             if (selectedPaymentMethod === 'online_payment') {
@@ -164,6 +181,13 @@
                             document.getElementById('razorpay_signature').value = response.razorpay_signature;
                             checkoutForm.submit();
                         },
+                        "modal": {
+                            "ondismiss": function(){
+                                // Update payment status to failed if modal is closed
+                                document.getElementById('payment_status').value = 'Failed';
+                                checkoutForm.submit();
+                            }
+                        },
                         "prefill": {
                             "name": "{{ request.user.get_full_name }}",
                             "email": "{{ request.user.email }}",
@@ -180,11 +204,21 @@
                     console.error('Error creating Razorpay order:', error);
                     // Handle error (e.g., show an error message to the user)
                 });
+            }  else if (selectedPaymentMethod === 'wallet') {
+                // Handle wallet payment
+                event.preventDefault();
+                document.getElementById('payment-method').value = 'wallet';
+                checkoutForm.submit();
             } else {
                 // Allow default form submission for COD
                 document.getElementById('payment-method').value = 'cash_on_delivery';
             }
         });
+        {% if messages %}
+        {% for message in messages %}
+        showAlert("{{ message }}", "{{ message.tags }}");
+        {% endfor %}
+    {% endif %}
     });
 </script>
 {% endblock scripts %}
